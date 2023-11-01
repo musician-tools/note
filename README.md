@@ -1,8 +1,9 @@
 
-  - [note](#note)
+  - [The {note} package](#the-note-package)
   - [Example](#example)
-  - [Introduction to immursive package building
-    guide](#introduction-to-immursive-package-building-guide)
+  - [Immursive package building experience from the
+    readme](#immursive-package-building-experience-from-the-readme)
+  - [Introduction](#introduction)
       - [Step 00: Press play *on the video
         guide*](#step-00-press-play-on-the-video-guide)
   - [Part I. Work on functionality](#part-i-work-on-functionality)
@@ -17,7 +18,8 @@
       - [Step 1: Create package architecture *using
         usethis::create\_package()*](#step-1-create-package-architecture-using-usethiscreate_package)
       - [Step 2: Describe what the package does *in the DESCRIPTION
-        file*](#step-2-describe-what-the-package-does-in-the-description-file)
+        file* in the top level of the package
+        directory](#step-2-describe-what-the-package-does-in-the-description-file-in-the-top-level-of-the-package-directory)
       - [Step 3: Add your functions *to an R Script saved in the R
         folder*](#step-3-add-your-functions-to-an-r-script-saved-in-the-r-folder)
       - [Step 4: Make the package “active” *and test your functions
@@ -29,9 +31,8 @@
         dependencies](#step-6-add-needed-dependencies)
           - [Step 6a. Declare dependencies *using
             usethis::use\_package(“package\_name”)*](#step-6a-declare-dependencies-using-usethisuse_packagepackage_name)
-          - [Step 6b: Add dependencies and export functions in R script
-            *using “\#’ @importFrom and \#’
-            @export”*](#step-6b-add-dependencies-and-export-functions-in-r-script-using--importfrom-and--export)
+          - [Step 6b: Add dependencies and export functions in R
+            script](#step-6b-add-dependencies-and-export-functions-in-r-script)
       - [Step 7: Document these additions *using a ‘Roxygen’
         skeleton*](#step-7-document-these-additions-using-a-roxygen-skeleton)
       - [Step 8: Incorporate documentation additions into package *using
@@ -47,13 +48,6 @@
     *usethis::use\_\*\_license()*](#step-11-create-a-license-using-usethisuse__license)
   - [Step 12: Build and install package using
     *devtools::build()*](#step-12-build-and-install-package-using-devtoolsbuild)
-  - [Step 13: Sharing online?](#step-13-sharing-online)
-      - [13.a Initialize your directory as git
-        repository](#13a-initialize-your-directory-as-git-repository)
-      - [13.b Push your package to your github
-        account.](#13b-push-your-package-to-your-github-account)
-  - [Step 14: Tell the world how to get your package *with
-    devtools::install\_github()*](#step-14-tell-the-world-how-to-get-your-package-with-devtoolsinstall_github)
   - [More topics you might consider
     investigating:](#more-topics-you-might-consider-investigating)
   - [Additional Resources](#additional-resources)
@@ -62,7 +56,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# note
+# The {note} package
 
 <!-- badges: start -->
 
@@ -70,7 +64,23 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of {note} is to play notes from R .
+The goal of {note} is to play notes using R, based in name (e.g. ‘C’),
+length of tone, and octave.
+
+The package was initially conceived [by Jim
+Hester](https://resources.rstudio.com/rstudio-conf-2018/you-can-make-a-package-in-20-minutes-jim-hester)
+as an example of how to quickly build an R package.
+
+I’ve written a non-immursive companion guide to Jim’s talk here:
+<https://evamaerey.github.io/package_in_20_minutes/package_in_20_minutes>
+
+I was extremely lucky to run across his talk when I did. I had promised
+to write a package for an RConsortium grant, but I’m not sure that I
+would have managed without Jim’s excellent walk-through.
+
+Recently I’ve explored ‘literate package building’ especially from the
+README, and have decided to return to Jim’s package to further
+experiment with this idea - and because note deserves to be shared\!
 
     devtools::install_github("musician-tools/note")
 
@@ -86,7 +96,9 @@ audio::play(note("A"))
 But this repo is also meant to be an *imursive* companion guide to Jim
 Hester’s, ‘You can make an R package in 20 minutes’.
 
-# Introduction to immursive package building guide
+# Immursive package building experience from the readme
+
+# Introduction
 
 Recently, several R packages have made creating *new* R packages — with
 all the required architecture and implementing best practices — much
@@ -135,12 +147,6 @@ written some functions. Maybe you’d like to make them available and want
 to make them available to the world. So let’s call this Step 0.
 
 For this tutorial you can use Jim Hester’s code reproduced here:
-
-# How we write the package…
-
-``` r
-usethis::create_package(".")
-```
 
 ``` r
 rate <- 44100
@@ -237,6 +243,12 @@ play_notes_df <- function(df, name, length, octave, volume){
   
 ```
 
+# How we write the package…
+
+``` r
+usethis::create_package(".")
+```
+
 Try it out interactively… (works but wonky\!)
 
 ``` r
@@ -267,7 +279,7 @@ test_that("calc frequency works", {
 ```
 
 ``` r
-readme2pkg::chunk_to_r("hesterfunctions")
+
 usethis::use_package("audio")
 usethis::use_mit_license()
 ```
@@ -292,76 +304,19 @@ devtools::build()
 
 ## Step 1: Create package architecture *using usethis::create\_package()*
 
-We create the new directory for the new “note package” with
-`create_package`.
-
 ``` r
 usethis::create_package(".")
 ```
 
-A new RStudio session should open, with the working directory of “note”,
-and the following file architecture for the package.
-
-## Step 2: Describe what the package does *in the DESCRIPTION file*
-
-Then you might want to check out the contents of the DESCRIPTION file.
-
-The DESCRIPTION looks like this…
-
-``` r
-Package: note
-Title: What the Package Does (One Line, Title Case)      <- Hey reader!  Change this part!
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
-Encoding: UTF-8
-LazyData: true
-```
-
-And you should probably update the title – ie replace “What the Package
-Does (One Line, Title Case)”. Of course you should do this for the
-“Description” too, especially if you package is intended for an
-audience of more than one.
+## Step 2: Describe what the package does *in the DESCRIPTION file* in the top level of the package directory
 
 ## Step 3: Add your functions *to an R Script saved in the R folder*
 
-  - Create a new script
-  - Copy and paste the desired function into that script (what’s in step
-    0)
-  - Save in the “R” folder
-
-So now you have an R script in your package directory:
-
 ``` r
-.
-├── DESCRIPTION
-├── NAMESPACE
-├── R
-│   └── note.R           <- what you added
-└── note.Rproj
+readme2pkg::chunk_to_r("hesterfunctions")
 ```
 
-**Protip:** *You can have multiple .R scripts in your R folder that
-contain package functions. The files in R/ directory are built in
-alphabetic order by default. But if you have dependencies in your R
-scripts you may need to change this order, and for that you can use the
-@include roxygen2 tag.*
-
-Something like this at the top of the script that requires functions
-from another .R file.
-
-``` r
-#' @include class-a.R
-setClass("B", contains = "A")
-```
-
-See <http://r-pkgs.had.co.nz/man.html> for more detail\!
+So now you have an R script in the R folder.
 
 ## Step 4: Make the package “active” *and test your functions interactively with devtools::load\_all()*
 
@@ -397,47 +352,13 @@ file.
 
 ``` r
 usethis::use_package("audio")
+#> • Refer to functions with `audio::fun()`
 ```
 
 Automatically, you should see that the end of the contents of the
 DESCRIPTION file has added “audio”:
 
-``` r
-Package: note
-Title: Play Music in R
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
-Encoding: UTF-8
-LazyData: true
-Imports: 
-    audio
-```
-
-### Step 6b: Add dependencies and export functions in R script *using “\#’ @importFrom and \#’ @export”*
-
-Now, in the R script, we indicate import from other packages — and what
-functions may be exported.
-
-Exported functions are the functions that will be available to the users
-once the package is loaded.
-
-``` r
-#' @importFrom audio play play.default
-#' @export
-audio::play
-
-#' @export
-print.note <- function(x, ...) {
-  audio::play(x, ...)
-}
-```
+### Step 6b: Add dependencies and export functions in R script
 
 ## Step 7: Document these additions *using a ‘Roxygen’ skeleton*
 
@@ -608,47 +529,15 @@ This builds a tar.gz, folder which is your compressed package\!
 
 “\~/Google Drive/note\_0.0.0.9000.tar.gz”
 
-# Step 13: Sharing online?
-
-## 13.a Initialize your directory as git repository
-
 ``` r
-usethis::use_git()
-```
-
-Or you can do this in your terminal: git init.
-
-## 13.b Push your package to your github account.
-
-Push package directory to [github](github.com).
-
-You might be able to use usethis::use\_github().
-
-``` r
-usethis::use_github()
-```
-
-But instead, I use the github instructions
-[here](https://help.github.com/en/articles/adding-an-existing-project-to-github-using-the-command-line).
-
-# Step 14: Tell the world how to get your package *with devtools::install\_github()*
-
-Now you can let your friends know where your package “lives”. And people
-can install your package with devtools::install\_github, and
-“githubusername/packagename”. This can be part of your readme. If you
-don’t submit to cran right away, you might direct people to install with
-the development version using devtools::install\_github.
-
-Here is an example:
-
-``` r
+library(note)
 ```
 
 -----
 
 # More topics you might consider investigating:
 
-  - What is travis?
+  - What is github actions?
   - What about the coverage report?
   - What about use\_rcpp?
 
@@ -666,10 +555,6 @@ A good starting point for these topics are the resources listed below.
 
 Some great additional resources are the following:
 
-  - [GitHub repository for Jim Hester’s
-    presentation](https://github.com/jimhester/presentations/tree/master/2018_02_03-You-can-make-a-package-in-20-minutes#readme)
-  - [The Note Package I created on Github based on the
-    presentation](https://github.com/EvaMaeRey/note)
   - [Hadley Wickham and Jennifer Bryan’s *R Packages: Chapter II ‘The
     Whole Game’*](https://r-pkgs.org/whole-game.html)
   - [Hillary Parker’s *Writing an R package from

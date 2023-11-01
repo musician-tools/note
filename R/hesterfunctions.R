@@ -27,20 +27,20 @@ calc_multiplier <- function(rate) {
   2 * pi / rate
 }
 
-#' Title
+#' Create music
 #'
-#' @param note 
-#' @param length 
-#' @param octave 
-#' @param volume 
+#' @param note name
+#' @param length in beats
+#' @param octave from middle C
+#' @param volume from 1 to 10
 #'
-#' @return
+#' @return a note object
 #' @export
 #'
 #' @examples
 #' note("A")
-note <- function(note, length = 1, octave = 0, volume = default_volume) {
-  frequency <- calc_frequency(note, octave)
+note <- function(name, length = 1, octave = 0, volume = default_volume) {
+  frequency <- calc_frequency(name, octave)
   volume <- calc_volume(volume)
   length <- calc_length(rate, length, bpm)
   multiplier <- calc_multiplier(rate)
@@ -51,4 +51,44 @@ note <- function(note, length = 1, octave = 0, volume = default_volume) {
 print.note <- function(x, ...) {
   audio::play(x, ...)
 }
+
+#' Title
+#'
+#' @param df 
+#' @param name 
+#' @param length 
+#' @param octave 
+#' @param volume 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+play_notes_df <- function(df, name, length, octave, volume){
+  
+  rate <- 44100
+  multiplier <- 2 * pi / rate
+  bpm <- 80
+  default_volume <- 5
+  
+  for (i in 1:nrow(df)){
+    
+  audio::play( note(name = df %>% pull({{name}}) %>% .[i],
+       length = df %>% pull({{length}}) %>% .[i],
+       octave = df %>% pull({{octave}}) %>% .[i]
+                            ))
+
+  Sys.sleep(df %>% pull({{length}}) %>% .[i] %>%
+        calc_length(rate = rate,
+                    length = .,
+                    bpm = bpm))
+
+  # Sys.sleep(.2)
+  
+  }
+    
+}
+  
+  
+
 
