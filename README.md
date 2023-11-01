@@ -222,23 +222,22 @@ play_notes_df <- function(df, name, length, octave, volume){
   bpm <- 80
   default_volume <- 5
   
-  for (i in 1:nrow(df)){
+  notes <- c()
     
-  audio::play( note(name = df %>% pull({{name}}) %>% .[i],
-       length = df %>% pull({{length}}) %>% .[i],
+    for (i in 1:nrow(df)){
+
+    notes <- c(notes, note(name = df %>% pull({{name}}) %>% .[i],
+       length = (df %>% pull({{length}}) %>% .[i]),
        octave = df %>% pull({{octave}}) %>% .[i]
                             ))
-
-  Sys.sleep(df %>% pull({{length}}) %>% .[i] %>%
-        calc_length(rate = rate,
-                    length = .,
-                    bpm = bpm))
-
-  # Sys.sleep(.2)
+        
+      }
+    
+  audio::play(notes)
   
   }
     
-}
+
   
   
 ```
@@ -264,6 +263,17 @@ potter_phrase = tibble::tribble(~name, ~length, ~octave,
 "F#", 1.5, 0)
 
 play_notes_df(potter_phrase, name = name, length = length, octave = octave)
+
+audio::play(c(
+note("B", .5, 0),
+note("E", .75, 0),
+note("G", .25, 0),
+note("F#", .5, 0),
+note("E", 1, 0),
+note("B", .5, 1),
+note("A", 1.5, 1),
+note("F#", 1.5, 0)
+))
 ```
 
 # time to test

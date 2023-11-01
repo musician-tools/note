@@ -71,23 +71,22 @@ play_notes_df <- function(df, name, length, octave, volume){
   bpm <- 80
   default_volume <- 5
   
-  for (i in 1:nrow(df)){
+  notes <- c()
     
-  audio::play( note(name = df %>% pull({{name}}) %>% .[i],
-       length = df %>% pull({{length}}) %>% .[i],
+    for (i in 1:nrow(df)){
+
+    notes <- c(notes, note(name = df %>% pull({{name}}) %>% .[i],
+       length = (df %>% pull({{length}}) %>% .[i]),
        octave = df %>% pull({{octave}}) %>% .[i]
                             ))
-
-  Sys.sleep(df %>% pull({{length}}) %>% .[i] %>%
-        calc_length(rate = rate,
-                    length = .,
-                    bpm = bpm))
-
-  # Sys.sleep(.2)
+        
+      }
+    
+  audio::play(notes)
   
   }
     
-}
+
   
   
 
