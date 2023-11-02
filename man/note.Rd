@@ -2,22 +2,35 @@
 % Please edit documentation in R/hesterfunctions.R
 \name{note}
 \alias{note}
-\title{Title}
+\title{Create music}
 \usage{
-note(note, length = 1, octave = 0, volume = default_volume)
+note(name, length = 1, octave = 0, volume = default_volume)
 }
 \arguments{
-\item{note}{}
+\item{length}{in beats}
 
-\item{length}{}
+\item{octave}{from middle C}
 
-\item{octave}{}
+\item{volume}{from 1 to 10}
 
-\item{volume}{}
+\item{note}{name}
+}
+\value{
+a note object
 }
 \description{
-Title
+Create music
 }
 \examples{
 note("A")
+audio::play(c(
+note("B", .5, 0),
+note("E", .75, 0),
+note("G", .25, 0),
+note("F#", .5, 0),
+note("E", 1, 0),
+note("B", .5, 1),
+note("A", 1.5, 1),
+note("F#", 1.5, 0)
+))
 }

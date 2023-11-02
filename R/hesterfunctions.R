@@ -39,6 +39,16 @@ calc_multiplier <- function(rate) {
 #'
 #' @examples
 #' note("A")
+#' audio::play(c(
+#' note("B", .5, 0),
+#' note("E", .75, 0),
+#' note("G", .25, 0),
+#' note("F#", .5, 0),
+#' note("E", 1, 0),
+#' note("B", .5, 1),
+#' note("A", 1.5, 1),
+#' note("F#", 1.5, 0)
+#' ))
 note <- function(name, length = 1, octave = 0, volume = default_volume) {
   frequency <- calc_frequency(name, octave)
   volume <- calc_volume(volume)
