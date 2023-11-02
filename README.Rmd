@@ -122,6 +122,40 @@ note <- function(name, length = 1, octave = 0, volume = default_volume) {
   structure(res, class = "note")
 }
 
+rel3octaves <- stringr::str_split("DRMFSLTdrmfslt12345678", "")[[1]]
+multiplier1octave <- c(1, 9/8, 81/64,4/3, 3/2, 27/16, 243/128)
+mult3 <- c(multiplier1octave/2, multiplier1octave, multiplier1octave*2, 4)
+
+
+calc_freq_relative <- function(doremi = "d", 
+                               do_freq = 440 #A above middle C
+                               ){
+  
+  440*mult3[which(rel3octaves == doremi)]
+  
+}
+
+calc_freq_relative()
+
+note_rel <- function(doremi, do_freq = 440, length = 1, volume = default_volume) {
+  
+  frequency <- calc_freq_relative(doremi, do_freq)
+  volume <- calc_volume(volume)
+  length <- calc_length(rate, length, bpm)
+  multiplier <- calc_multiplier(rate)
+  res <- sin(frequency * multiplier * length) * volume
+  structure(res, class = "note")
+  
+}
+
+
+# audio::play(note_rel(doremi = "8"))
+
+
+print.note_rel <- function(x, ...) {
+  audio::play(x, ...)
+}
+
 print.note <- function(x, ...) {
   audio::play(x, ...)
 }
@@ -161,6 +195,12 @@ play_notes_df <- function(df, name, length, octave, volume){
   }
     
 
+
+note_movable <- function(){
+  
+
+  
+}
   
   
 

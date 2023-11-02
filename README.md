@@ -26,7 +26,8 @@
           - [Build package 🚧](#build-package-)
           - [Make aspirational part of readme real.
             🚧](#make-aspirational-part-of-readme-real-)
-          - [Add lifecycle badge](#add-lifecycle-badge)
+          - [Add lifecycle badge
+            (experimental)](#add-lifecycle-badge-experimental)
       - [Phase 2: Listen & iterate 🚧](#phase-2-listen--iterate-)
       - [Phase 3: Let thinggs settle](#phase-3-let-thinggs-settle)
           - [Settled on examples. Put them in the roxygen skeleton and
@@ -43,7 +44,7 @@
           - [Package website built? 🚧](#package-website-built-)
           - [Package website deployed? 🚧](#package-website-deployed-)
       - [Phase 3: Harden/commit](#phase-3-hardencommit)
-          - [Submit to CRAN? 🚧](#submit-to-cran-)
+          - [Submit to CRAN? Or don’t. 🚧](#submit-to-cran-or-dont-)
   - [Appendix: Reports, Environment](#appendix-reports-environment)
       - [Description file extract](#description-file-extract)
       - [Environment](#environment)
@@ -164,6 +165,41 @@ note <- function(name, length = 1, octave = 0, volume = default_volume) {
   structure(res, class = "note")
 }
 
+rel3octaves <- stringr::str_split("DRMFSLTdrmfslt12345678", "")[[1]]
+multiplier1octave <- c(1, 9/8, 81/64,4/3, 3/2, 27/16, 243/128)
+mult3 <- c(multiplier1octave/2, multiplier1octave, multiplier1octave*2, 4)
+
+
+calc_freq_relative <- function(doremi = "d", 
+                               do_freq = 440 #A above middle C
+                               ){
+  
+  440*mult3[which(rel3octaves == doremi)]
+  
+}
+
+calc_freq_relative()
+#> [1] 440
+
+note_rel <- function(doremi, do_freq = 440, length = 1, volume = default_volume) {
+  
+  frequency <- calc_freq_relative(doremi, do_freq)
+  volume <- calc_volume(volume)
+  length <- calc_length(rate, length, bpm)
+  multiplier <- calc_multiplier(rate)
+  res <- sin(frequency * multiplier * length) * volume
+  structure(res, class = "note")
+  
+}
+
+
+# audio::play(note_rel(doremi = "8"))
+
+
+print.note_rel <- function(x, ...) {
+  audio::play(x, ...)
+}
+
 print.note <- function(x, ...) {
   audio::play(x, ...)
 }
@@ -203,6 +239,12 @@ play_notes_df <- function(df, name, length, octave, volume){
   }
     
 
+
+note_movable <- function(){
+  
+
+  
+}
   
   
 ```
@@ -295,7 +337,7 @@ remove the 🦄 emoji and perhaps replace it with construction site if you
 are still uncertain of the API, and want to highlight that it is subject
 to change.
 
-### Add lifecycle badge
+### Add lifecycle badge (experimental)
 
 ``` r
 usethis::use_lifecycle_badge("experimental")
@@ -322,7 +364,7 @@ test_that("calc frequency works", {
   expect_equal(calc_frequency("A", -1), 220)
   
 })
-#> Test passed 😸
+#> Test passed 🎉
 ```
 
 ``` r
@@ -341,7 +383,7 @@ readme2pkg::chunk_to_tests_testthat("test_calc_frequency_works")
 
 ## Phase 3: Harden/commit
 
-### Submit to CRAN? 🚧
+### Submit to CRAN? Or don’t. 🚧
 
 # Appendix: Reports, Environment
 
