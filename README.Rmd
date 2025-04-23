@@ -60,20 +60,34 @@ Your video guide is [here](https://resources.rstudio.com/rstudio-conf-2018/you-c
 
 Have some functions that you'd like to package up *like the below from Hester's 'note' example*
 
+# helper objects and functions
 
-```{r hesterfunctions}
+```{r helperfunctions}
 rate <- 44100
 multiplier <- 2 * pi / rate
 bpm <- 80
 default_volume <- 5
 
-notes <- c("A" = 0, "A#" = 1, "Bb" = 1, "B" = 2, "Cb" = 2, "B#" = 3, "C" = 3,
+note_names <- c("A" = 0, "A#" = 1, "Bb" = 1, "B" = 2, "Cb" = 2, "B#" = 3, "C" = 3,
   "C#" = 4, "Db" = 4, "D" = 5, "D#" = 6, "Eb" = 6, "E" = 7, "Fb" = 7, "E#" = 8,
   "F" = 8, "F#" = 9, "Gb" = 9, "G" = 10, "G#" = 11, "Ab" = 11)
 
-calc_frequency <- function(note, octave) {
+rel3octaves <- stringr::str_split("DRMFSLTdrmfslt12345678", "")[[1]]
+multiplier1octave <- c(1, 9/8, 81/64,4/3, 3/2, 27/16, 243/128)
+mult3 <- c(multiplier1octave/2, multiplier1octave, multiplier1octave*2, 4)
+
+drm_names <- mult3 
+names(drm_names) <- rel3octaves
+
+drm_to_freq <- function(drm = c("d", "r", "m"), freq_d = 440){
+  
+  drm_names[drm]*440
+  
+}
+
+note_name_to_freq <- function(note_name, octave) {
   # 440hz is A above middle C
-  440 * 2^((unname(notes[note]) + (octave * 12)) / 12)
+  440 * 2^((unname(note_names[note_name]) + (octave * 12)) / 12)
 }
 
 calc_volume <- function(x) {
@@ -90,31 +104,23 @@ calc_length <- function(rate, length, bpm) {
 calc_multiplier <- function(rate) {
   2 * pi / rate
 }
+```
 
-#' Create music
-#'
-#' @param note name
-#' @param length in beats
-#' @param octave from middle C
-#' @param volume from 1 to 10
-#'
-#' @return a note object
+# Exported 
+
+## `note()`
+
+```{r note}
 #' @export
 #'
 #' @examples
 #' note("A")
 #' audio::play(c(
 #' note("B", .5, 0),
-#' note("E", .75, 0),
-#' note("G", .25, 0),
-#' note("F#", .5, 0),
-#' note("E", 1, 0),
-#' note("B", .5, 1),
-#' note("A", 1.5, 1),
-#' note("F#", 1.5, 0)
-#' ))
-note <- function(name, length = 1, octave = 0, volume = default_volume) {
-  frequency <- calc_frequency(name, octave)
+#' note("E", .75, 0)))
+note <- function(note_name = NULL, drm = NULL, length = 1, octave = 0, volume = default_volume) {
+  if(!is.null(note_name)){frequency <- note_name_to_freq(note_name, octave)}
+  if(!is.null(drm)){frequency <- drm_to_freq(drm)}
   volume <- calc_volume(volume)
   length <- calc_length(rate, length, bpm)
   multiplier <- calc_multiplier(rate)
@@ -122,31 +128,7 @@ note <- function(name, length = 1, octave = 0, volume = default_volume) {
   structure(res, class = "note")
 }
 
-rel3octaves <- stringr::str_split("DRMFSLTdrmfslt12345678", "")[[1]]
-multiplier1octave <- c(1, 9/8, 81/64,4/3, 3/2, 27/16, 243/128)
-mult3 <- c(multiplier1octave/2, multiplier1octave, multiplier1octave*2, 4)
-
-
-calc_freq_relative <- function(doremi = "d", 
-                               do_freq = 440 #A above middle C
-                               ){
-  
-  440*mult3[which(rel3octaves == doremi)]
-  
-}
-
-calc_freq_relative()
-
-note_rel <- function(doremi, do_freq = 440, length = 1, volume = default_volume) {
-  
-  frequency <- calc_freq_relative(doremi, do_freq)
-  volume <- calc_volume(volume)
-  length <- calc_length(rate, length, bpm)
-  multiplier <- calc_multiplier(rate)
-  res <- sin(frequency * multiplier * length) * volume
-  structure(res, class = "note")
-  
-}
+# note(drm = "d", volume = 5)
 
 
 # audio::play(note_rel(doremi = "8"))
@@ -159,7 +141,26 @@ print.note_rel <- function(x, ...) {
 print.note <- function(x, ...) {
   audio::play(x, ...)
 }
+```
 
+
+## `play_notes_df()`
+
+```{r }
+harry_potter_phrase_df <- tibble::tribble(~name,~length,~octave, 
+        "B", .5, 0,
+         "E", .75, 0,
+         "G", .25, 0,
+         "F#", .5, 0,
+         "E", 1, 0,
+         "B", .5, 1,
+         "A", 1.5, 1,
+         "F#", 1.5, 0) 
+```
+
+
+
+```{r play_notes_df}
 #' Title
 #'
 #' @param df 
@@ -172,72 +173,102 @@ print.note <- function(x, ...) {
 #' @export
 #'
 #' @examples
-play_notes_df <- function(df, name, length, octave, volume){
+play_notes_df <- function(df, note_name, length, octave, volume){
   
   rate <- 44100
   multiplier <- 2 * pi / rate
   bpm <- 80
   default_volume <- 5
   
+  note_names = df |> dplyr::pull({{note_name}})
+  lengths = df |> dplyr::pull({{length}})
+  octaves = df |> dplyr::pull({{octave}})
+  
+  
   notes <- c()
     
     for (i in 1:nrow(df)){
 
-    notes <- c(notes, note(name = df %>% pull({{name}}) %>% .[i],
-       length = (df %>% pull({{length}}) %>% .[i]),
-       octave = df %>% pull({{octave}}) %>% .[i]
+    notes <- c(notes, 
+               note(note_name = note_names[i],
+                    length = lengths[i],
+                    octave = octaves[i]
                             ))
         
-      }
-    
-  audio::play(notes)
+    }
   
-  }
-    
+    audio::play(notes)
 
-
-note_movable <- function(){
-  
-
-  
 }
   
   
+play_drm_df <- function(df, drm, length, volume){
+  
+  rate <- 44100
+  multiplier <- 2 * pi / rate
+  bpm <- 80
+  default_volume <- 5
+  
+
+  drms = df |> dplyr::pull({{drm}}) 
+  lengths = df |> dplyr::pull({{length}})
+  volumes = df |> dplyr::pull({{volume}})
+  
+  
+  notes <- c()
+    
+    for (i in 1:nrow(df)){
+
+    notes <- c(notes, 
+               note(note_name = note_names[i],
+                    drm = drms[i],
+                    length = lengths[i]))
+        
+      }  
+  
+    
+  audio::play(notes)
+  
+}
+```
+
+
+```{r}
+harry_potter_phrase_df |>
+  play_notes_df(note_name = name, 
+                length = length, 
+                octave = octave)
+
+library(tidyverse)
+ggdoremi:::parse_phrases_drm("ddssllssffmmrrdd", base_freq = 440) |>
+  dplyr::mutate(length = 1, volume = 2) |>
+  play_drm_df(drm = drm, length = length, volume = volume)
+
+ggdoremi:::parse_phrases_drm("mssssllt
+                             t1111112
+                             2222233322") |>
+  ungroup() |>
+  dplyr::mutate(length = rep(c(1,2), 13)/1.4,
+         volume = 1) |> 
+  play_drm_df(drm = drm, length = length, volume = volume)
 
 
 ```
 
 
 
-
-
-# Part II. Packaging and documentation  🚧 ✅ 
 
 
 
 ## Phase 1. Minimal working package
 
-### Created files for package archetecture with `devtools::create(".")` ✅ 
-
-### Moved functions R folder? ✅  
-
-```{r}
-knitr::knit_code$get() |> names()
-```
-
-Use new {readme2pkg} function to do this from readme...
-
 ```{r, eval = F}
-readme2pkg::chunk_to_r("hesterfunctions")
+# devtools::create(".")
 ```
 
+### Added roxygen skeleton and manage dependancies? ✅ 
 
-
-### Added roxygen skeleton? ✅ 
-
-Use a roxygen skeleton for auto documentation and making sure proposed functions are *exported*.
-
-### Managed dependencies ? ✅ 
+Use a roxygen skeleton for auto documentation and making sure proposed functions are *exported* and dependencies documented.
 
 Package dependencies managed, i.e. `depend::function()` in proposed functions and declared in the DESCRIPTION
 
@@ -246,54 +277,92 @@ usethis::use_package("audio")
 ```
 
 
+### Moved functions R folder? ✅  
+
+```{r}
+knitrExtra::chunk_names_get()
+knitrExtra::chunk_to_dir(c("helperfunctions", "note", "play_notes_df"))
+```
+
+### Package data set
+
+```{r harry_potter_phrase_df}
+harry_potter_phrase_df <- tibble::tribble(~name,~length,~octave, 
+        "B", .5, 0,
+         "E", .75, 0,
+         "G", .25, 0,
+         "F#", .5, 0,
+         "E", 1, 0,
+         "B", .5, 1,
+         "A", 1.5, 1,
+         "F#", 1.5, 0) 
+
+usethis::use_data(harry_potter_phrase_df, overwrite = T)
+```
+
+
+
+```{r}
+# usethis::use_data_raw()
+knitrExtra::chunk_to_dir(c("harry_potter_phrase_df"), 
+                         dir = "data-raw")
+```
+
+### Check and install
+
+```{r, results='hide', error=T, eval = F}
+devtools::check(pkg = ".")
+devtools::install(pkg = ".", upgrade = "never")
+```
+
+### Traditional readme
+
+```{r, eval = F}
+# library(note)
+
+audio::play(note("A"))
+
+audio::play(c(
+note("B", .5, 0),
+note("E", .75, 0),
+note("G", .25, 0)
+))
+
+harry_potter_phrase_df |>
+  play_notes_df(name = name, 
+                length = length, 
+                octave = octave)
+
+
+```
+
+
+
+
+## Just beyond minimal
 
 ### Chosen a license? ✅ 
 
 
 ```{r}
 usethis::use_mit_license()
-```
-
-### Run `devtools::check()` and addressed errors? ✅ 
-
-```{r, results='hide', error=T}
-devtools::check(pkg = ".")
-```
-
-### Build package 🚧 
-
-```{r}
-devtools::build()
-```
-
-You need to do this before library(mynewpackage) will work.
-
-### Make aspirational part of readme real. 🚧 
-
-At this point, you could change eval chunk options to TRUE. You can remove  the 🦄 emoji and perhaps replace it with construction site if you are still uncertain of the API, and want to highlight that it is subject to change. 
-
-### Add lifecycle badge (experimental)
-
-```{r}
 usethis::use_lifecycle_badge("experimental")
 ```
-
 
 ## Phase 2: Listen & iterate 🚧 
 
 Try to get feedback from experts on API, implementation, default decisions.  Is there already work that solves this problem? 
 
 
-## Phase 3: Let thinggs settle
+## Phase 3: Let things settle
 
-### Settled on examples.  Put them in the roxygen skeleton and readme. 🚧 
-
-### Written formal tests of functions? 🚧 
+- Settled on examples.  Put them in the roxygen skeleton and readme. 🚧 
+- Written formal tests of functions? 🚧 
 
 
 That would look like this...
 
-```{r test_calc_frequency_works}
+```{r test_calc_frequency_works, eval = F}
 library(testthat)
 
 test_that("calc frequency works", {
@@ -303,48 +372,17 @@ test_that("calc frequency works", {
 })
 ```
 
-
 ```{r}
-readme2pkg::chunk_to_tests_testthat("test_calc_frequency_works")
+knitrExtra:::chunk_to_tests_testthat("test_calc_frequency_works")
 ```
 
+- add a description and author information in the DESCRIPTION file? 🚧 
+- Addressed *all* notes, warnings and errors. 🚧 
+- Promote to wider audience...
+- Package website built? 🚧 
+- Package website deployed? 🚧 
+- Submit to CRAN? Or don't.  🚧 
 
-### Have you worked added a description and author information in the DESCRIPTION file? 🚧 
-
-### Addressed *all* notes, warnings and errors. 🚧 
-
-## Promote to wider audience...
-
-### Package website built? 🚧 
-
-### Package website deployed? 🚧 
-
-## Phase 3: Harden/commit
-
-### Submit to CRAN? Or don't.  🚧 
-
-# Appendix: Reports, Environment
-
-## Description file extract
-
-```{r}
-
-```
-
-## Environment
-
-Here I just want to print the packages and the versions
-
-```{r}
-all <- sessionInfo() |> print() |> capture.output()
-all[11:17]
-```
-
-## `devtools::check()` report
-
-```{r, error = T, results="hide", warning=F}
-devtools::check(pkg = ".")
-```
 
 
 
