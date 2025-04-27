@@ -1,15 +1,10 @@
 Package: note
 Title: Play Notes
 Version: 0.0.0.9000
-Authors@R: c(
-    person(given = "Jim",
-           family = "Hester",
-           role = c("aut", "cre")),
-    person(given = "Evangeline",
-           family = "Reynolds",
-           role = c("aut"),
-           email = "evangeline.mae@gmail.com"))
-Description: This package lets you play notes using note name e.g. 'C', octive and duration as inputs (one paragraph).
+Authors@R: 
+    c(person("Jim", "Hester", , "first.last@example.com", role = c("aut")),
+      person("Evangeline", "Reynolds", , "first.last@example.com", role = c("aut", "cre")))
+Description: This package lets you play notes using note name,e.g. 'C', octive and duration as inputs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

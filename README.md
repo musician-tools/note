@@ -11,8 +11,11 @@
 - [Exported](#exported)
   - [`note()`](#note)
   - [`potter_phrase_df`](#potter_phrase_df)
-  - [`play_notes_df()` and
-    `play_drm_df()`](#play_notes_df-and-play_drm_df)
+  - [document_potter_phrase_df](#document_potter_phrase_df)
+  - [`harry_potter_phrase_df`](#harry_potter_phrase_df)
+  - [document_twinkle_phrase_df](#document_twinkle_phrase_df)
+  - [`play_notes_df()`](#play_notes_df)
+  - [`play_drm_df()`](#play_drm_df)
     - [Try this all out…](#try-this-all-out)
   - [Phase 1. Minimal working package](#phase-1-minimal-working-package)
     - [Added roxygen skeleton and manage dependancies?
@@ -181,6 +184,8 @@ usethis::use_data(potter_phrase_df, overwrite = T)
 #> • Document your data (see 'https://r-pkgs.org/data.html')
 ```
 
+## document_potter_phrase_df
+
 ``` r
 #' Harry Potter theme data frame
 #'
@@ -199,6 +204,8 @@ usethis::use_data(potter_phrase_df, overwrite = T)
 #> [1] "potter_phrase_df"
 ```
 
+## `harry_potter_phrase_df`
+
 ``` r
 twinkle_phrase_df <- tibble::tribble(~drm,~duration,
         "d", 1, 
@@ -213,6 +220,8 @@ usethis::use_data(twinkle_phrase_df, overwrite = T)
 #> ✔ Saving 'twinkle_phrase_df' to 'data/twinkle_phrase_df.rda'
 #> • Document your data (see 'https://r-pkgs.org/data.html')
 ```
+
+## document_twinkle_phrase_df
 
 ``` r
 #' Harry Potter theme data frame
@@ -231,7 +240,7 @@ usethis::use_data(twinkle_phrase_df, overwrite = T)
 #> [1] "twinkle_phrase_df"
 ```
 
-## `play_notes_df()` and `play_drm_df()`
+## `play_notes_df()`
 
 ``` r
 #' play_notes_df
@@ -281,6 +290,8 @@ potter_phrase_df |>
                 duration = duration, 
                 octave = octave)
 ```
+
+## `play_drm_df()`
 
 ``` r
 #' play_drm_df
@@ -367,7 +378,7 @@ knitrExtra::chunk_names_get()
 #> [13] "unnamed-chunk-5"              "unnamed-chunk-6"             
 #> [15] "unnamed-chunk-7"              "unnamed-chunk-8"             
 #> [17] "unnamed-chunk-9"              "test_note_name_to_freq_works"
-#> [19] "unnamed-chunk-10"
+#> [19] "unnamed-chunk-10"             "unnamed-chunk-11"
 knitrExtra::chunk_to_dir(c( "helperfunctions"   , "note"   , "potter_phrase_df","document_potter_phrase_df" , "harry_potter_phrase_df",       "document_twinkle_phrase_df"  , "play_notes_df", "play_drm_df"    ))
 #> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
 #> It seems you are currently knitting a Rmd/Qmd file. The parsing of the file will be done in a new R session.
@@ -427,6 +438,9 @@ knitrExtra:::chunk_to_tests_testthat("test_note_name_to_freq_works")
 - add a description and author information in the DESCRIPTION file? 🚧
 - Addressed *all* notes, warnings and errors. 🚧
 - Promote to wider audience…
-- Package website built? 🚧
-- Package website deployed? 🚧
+- Package website built? Package website deployed? Or don’t. 🚧
 - Submit to CRAN? Or don’t. 🚧
+
+``` r
+# devtools::submit_cran()
+```

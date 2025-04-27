@@ -158,7 +158,7 @@ potter_phrase_df <- tibble::tribble(~note, ~duration, ~octave,
 
 usethis::use_data(potter_phrase_df, overwrite = T)
 ```
-
+## document_potter_phrase_df
 
 ```{r document_potter_phrase_df}
 #' Harry Potter theme data frame
@@ -179,7 +179,7 @@ usethis::use_data(potter_phrase_df, overwrite = T)
 
 
 ```
-
+## `harry_potter_phrase_df`
 
 ```{r harry_potter_phrase_df}
 twinkle_phrase_df <- tibble::tribble(~drm,~duration,
@@ -194,6 +194,7 @@ twinkle_phrase_df <- tibble::tribble(~drm,~duration,
 usethis::use_data(twinkle_phrase_df, overwrite = T)
 ```
 
+## document_twinkle_phrase_df
 
 ```{r document_twinkle_phrase_df}
 #' Harry Potter theme data frame
@@ -215,8 +216,7 @@ usethis::use_data(twinkle_phrase_df, overwrite = T)
 ```
 
 
-## `play_notes_df()` and `play_drm_df()`
-
+## `play_notes_df()` 
 
 ```{r play_notes_df}
 #' play_notes_df
@@ -267,6 +267,9 @@ potter_phrase_df |>
                 octave = octave)
 
 ```
+
+
+## `play_drm_df()`
 
 
 ```{r play_drm_df}
@@ -402,11 +405,14 @@ knitrExtra:::chunk_to_tests_testthat("test_note_name_to_freq_works")
 - add a description and author information in the DESCRIPTION file? 🚧 
 - Addressed *all* notes, warnings and errors. 🚧 
 - Promote to wider audience...
-- Package website built? 🚧 
-- Package website deployed? 🚧 
+- Package website built? Package website deployed? Or don't. 🚧 
 - Submit to CRAN? Or don't.  🚧 
 
+```{r, eval = F}
+# devtools::submit_cran()
 
+
+```
 
 
 
