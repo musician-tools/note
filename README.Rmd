@@ -16,22 +16,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Objective 1: Introducing the {note} package! 🦄 (typical package write up; but actually aspirational)
+# Objective 1: Introducing the {note} package! 
 
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 
-The goal of {note} is to play notes using R, based in name (e.g. 'C'), length of tone, and octave.
-
+The goal of {note} is to play notes using R, based in name (e.g. 'C'), duration of tone, and octave.
 
 ```
 devtools::install_github("musician-tools/note")
 ```  
   
-## Example  🦄 (Aspirational; describes target API)
-
 Try in an interactive session: 
 
 ```{r, eval = F}
@@ -97,8 +94,8 @@ calc_volume <- function(x) {
   x / 10
 }
 
-calc_length <- function(rate, length, bpm) {
-  seq(1, as.integer(rate * length * 60 / bpm))
+calc_duration <- function(rate, duration, bpm) {
+  seq(1, as.integer(rate * duration * 60 / bpm))
 }
 
 calc_multiplier <- function(rate) {
@@ -111,6 +108,14 @@ calc_multiplier <- function(rate) {
 ## `note()`
 
 ```{r note}
+#' note
+#' 
+#' @param name note name
+#' @param octave octave
+#' @param drm drm 
+#' @param duration duration
+#' @param volume volume
+#'
 #' @export
 #'
 #' @examples
@@ -118,20 +123,15 @@ calc_multiplier <- function(rate) {
 #' audio::play(c(
 #' note("B", .5, 0),
 #' note("E", .75, 0)))
-note <- function(note_name = NULL, drm = NULL, length = 1, octave = 0, volume = default_volume) {
-  if(!is.null(note_name)){frequency <- note_name_to_freq(note_name, octave)}
+note <- function(name = NULL, octave = 0, drm = NULL, duration = 1, volume = default_volume) {
+  if(!is.null(name)){frequency <- note_name_to_freq(name, octave)}
   if(!is.null(drm)){frequency <- drm_to_freq(drm)}
   volume <- calc_volume(volume)
-  length <- calc_length(rate, length, bpm)
+  duration <- calc_duration(rate, duration, bpm)
   multiplier <- calc_multiplier(rate)
-  res <- sin(frequency * multiplier * length) * volume
+  res <- sin(frequency * multiplier * duration) * volume
   structure(res, class = "note")
 }
-
-# note(drm = "d", volume = 5)
-
-
-# audio::play(note_rel(doremi = "8"))
 
 
 print.note_rel <- function(x, ...) {
@@ -143,12 +143,11 @@ print.note <- function(x, ...) {
 }
 ```
 
+## `potter_phrase_df`
 
-## `play_notes_df()`
-
-```{r }
-harry_potter_phrase_df <- tibble::tribble(~name,~length,~octave, 
-        "B", .5, 0,
+```{r potter_phrase_df}
+potter_phrase_df <- tibble::tribble(~note, ~duration, ~octave, 
+         "B", .5, 0,
          "E", .75, 0,
          "G", .25, 0,
          "F#", .5, 0,
@@ -156,43 +155,102 @@ harry_potter_phrase_df <- tibble::tribble(~name,~length,~octave,
          "B", .5, 1,
          "A", 1.5, 1,
          "F#", 1.5, 0) 
+
+usethis::use_data(potter_phrase_df, overwrite = T)
 ```
 
 
+```{r document_potter_phrase_df}
+#' Harry Potter theme data frame
+#'
+#' Note, duration and  ...
+#'
+#' @format ## `potter_phrase_df`
+#' A data frame with 8 rows:
+#' \describe{
+#'   \item{note}{note name}
+#'   \item{duration}{duration of note}
+#'   \item{octave}{note octave}
+#'   ...
+#' }
+#' @source <https://www.warnerbros.com/movies/harry-potter-complete-8-film-collection>
+"potter_phrase_df"
+
+
+
+```
+
+
+```{r harry_potter_phrase_df}
+twinkle_phrase_df <- tibble::tribble(~drm,~duration,
+        "d", 1, 
+         "d", 1, 
+         "s", 1, 
+         "s", 1, 
+         "l", 1, 
+         "l", 1, 
+         "s", 2) 
+
+usethis::use_data(twinkle_phrase_df, overwrite = T)
+```
+
+
+```{r document_twinkle_phrase_df}
+#' Harry Potter theme data frame
+#'
+#' Note, duration and  ...
+#'
+#' @format ## `twinkle_phrase_df`
+#' A data frame with 8 rows:
+#' \describe{
+#'   \item{drm}{note name using drm schema}
+#'   \item{duration}{duration of note}
+#'   ...
+#' }
+#' @source <https://www.warnerbros.com/movies/harry-potter-complete-8-film-collection>
+"twinkle_phrase_df"
+
+
+
+```
+
+
+## `play_notes_df()` and `play_drm_df()`
+
 
 ```{r play_notes_df}
-#' Title
+#' play_notes_df
 #'
-#' @param df 
-#' @param name 
-#' @param length 
-#' @param octave 
-#' @param volume 
+#' @param data A data frame
+#' @param name character variable with note names
+#' @param octave numeric with note octave
+#' @param duration numeric with note duration
+#' @param volume numeric with note volume
 #'
 #' @return
 #' @export
 #'
 #' @examples
-play_notes_df <- function(df, note_name, length, octave, volume){
+play_notes_df <- function(data, name, octave, duration,  volume){
   
   rate <- 44100
   multiplier <- 2 * pi / rate
   bpm <- 80
   default_volume <- 5
   
-  note_names = df |> dplyr::pull({{note_name}})
-  lengths = df |> dplyr::pull({{length}})
-  octaves = df |> dplyr::pull({{octave}})
+  names = data |> dplyr::pull({{name}})
+  durations = data |> dplyr::pull({{duration}})
+  octaves = data |> dplyr::pull({{octave}})
   
   
   notes <- c()
     
-    for (i in 1:nrow(df)){
+    for (i in 1:nrow(data)){
 
     notes <- c(notes, 
-               note(note_name = note_names[i],
-                    length = lengths[i],
-                    octave = octaves[i]
+               note(name = names[i],
+                    octave = octaves[i],
+                    duration = durations[i]
                             ))
         
     }
@@ -200,9 +258,30 @@ play_notes_df <- function(df, note_name, length, octave, volume){
     audio::play(notes)
 
 }
-  
-  
-play_drm_df <- function(df, drm, length, volume){
+```
+
+```{r}
+potter_phrase_df |>
+  play_notes_df(name = note, 
+                duration = duration, 
+                octave = octave)
+
+```
+
+
+```{r play_drm_df}
+#' play_drm_df
+#'
+#' @param data A data frame
+#' @param drm a variable with drm encoding
+#' @param duration note duration
+#' @param volume volume duration
+#'
+#' @return will play notes
+#' @export
+#'
+#' @examples  
+play_drm_df <- function(data, drm, duration, volume){
   
   rate <- 44100
   multiplier <- 2 * pi / rate
@@ -210,19 +289,18 @@ play_drm_df <- function(df, drm, length, volume){
   default_volume <- 5
   
 
-  drms = df |> dplyr::pull({{drm}}) 
-  lengths = df |> dplyr::pull({{length}})
-  volumes = df |> dplyr::pull({{volume}})
+  drms = data |> dplyr::pull({{drm}}) 
+  durations = data |> dplyr::pull({{duration}})
+  volumes = data |> dplyr::pull({{volume}})
   
   
   notes <- c()
     
-    for (i in 1:nrow(df)){
+    for (i in 1:nrow(data)){
 
     notes <- c(notes, 
-               note(note_name = note_names[i],
-                    drm = drms[i],
-                    length = lengths[i]))
+               note(drm = drms[i],
+                    duration = durations[i]))
         
       }  
   
@@ -232,27 +310,15 @@ play_drm_df <- function(df, drm, length, volume){
 }
 ```
 
+### Try this all out...
 
 ```{r}
-harry_potter_phrase_df |>
-  play_notes_df(note_name = name, 
-                length = length, 
-                octave = octave)
-
-library(tidyverse)
-ggdoremi:::parse_phrases_drm("ddssllssffmmrrdd", base_freq = 440) |>
-  dplyr::mutate(length = 1, volume = 2) |>
-  play_drm_df(drm = drm, length = length, volume = volume)
-
-ggdoremi:::parse_phrases_drm("mssssllt
-                             t1111112
-                             2222233322") |>
-  ungroup() |>
-  dplyr::mutate(length = rep(c(1,2), 13)/1.4,
-         volume = 1) |> 
-  play_drm_df(drm = drm, length = length, volume = volume)
-
-
+twinkle_phrase_df |> 
+  dplyr::mutate(volume = 1,
+                duration = duration/2) |>
+  play_drm_df(drm = drm, 
+              duration = duration, 
+              volume = volume)
 ```
 
 
@@ -274,6 +340,7 @@ Package dependencies managed, i.e. `depend::function()` in proposed functions an
 
 ```{r}
 usethis::use_package("audio")
+usethis::use_package("dplyr")
 ```
 
 
@@ -281,61 +348,17 @@ usethis::use_package("audio")
 
 ```{r}
 knitrExtra::chunk_names_get()
-knitrExtra::chunk_to_dir(c("helperfunctions", "note", "play_notes_df"))
+knitrExtra::chunk_to_dir(c( "helperfunctions"   , "note"   , "potter_phrase_df","document_potter_phrase_df" , "harry_potter_phrase_df",       "document_twinkle_phrase_df"  , "play_notes_df", "play_drm_df"    ))
 ```
 
-### Package data set
-
-```{r harry_potter_phrase_df}
-harry_potter_phrase_df <- tibble::tribble(~name,~length,~octave, 
-        "B", .5, 0,
-         "E", .75, 0,
-         "G", .25, 0,
-         "F#", .5, 0,
-         "E", 1, 0,
-         "B", .5, 1,
-         "A", 1.5, 1,
-         "F#", 1.5, 0) 
-
-usethis::use_data(harry_potter_phrase_df, overwrite = T)
-```
-
-
-
-```{r}
-# usethis::use_data_raw()
-knitrExtra::chunk_to_dir(c("harry_potter_phrase_df"), 
-                         dir = "data-raw")
-```
 
 ### Check and install
 
 ```{r, results='hide', error=T, eval = F}
+devtools::document()
 devtools::check(pkg = ".")
 devtools::install(pkg = ".", upgrade = "never")
 ```
-
-### Traditional readme
-
-```{r, eval = F}
-# library(note)
-
-audio::play(note("A"))
-
-audio::play(c(
-note("B", .5, 0),
-note("E", .75, 0),
-note("G", .25, 0)
-))
-
-harry_potter_phrase_df |>
-  play_notes_df(name = name, 
-                length = length, 
-                octave = octave)
-
-
-```
-
 
 
 
@@ -362,18 +385,18 @@ Try to get feedback from experts on API, implementation, default decisions.  Is 
 
 That would look like this...
 
-```{r test_calc_frequency_works, eval = F}
+```{r test_note_name_to_freq_works, eval = F}
 library(testthat)
 
-test_that("calc frequency works", {
-  expect_equal(calc_frequency("A", 0), 440)
-  expect_equal(calc_frequency("A", -1), 220)
+test_that("note_name_to_freq works", {
+  expect_equal(note_name_to_freq("A", 0), 440)
+  expect_equal(note_name_to_freq("A", -1), 220)
   
 })
 ```
 
 ```{r}
-knitrExtra:::chunk_to_tests_testthat("test_calc_frequency_works")
+knitrExtra:::chunk_to_tests_testthat("test_note_name_to_freq_works")
 ```
 
 - add a description and author information in the DESCRIPTION file? 🚧 

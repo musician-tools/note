@@ -32,8 +32,8 @@ calc_volume <- function(x) {
   x / 10
 }
 
-calc_length <- function(rate, length, bpm) {
-  seq(1, as.integer(rate * length * 60 / bpm))
+calc_duration <- function(rate, duration, bpm) {
+  seq(1, as.integer(rate * duration * 60 / bpm))
 }
 
 calc_multiplier <- function(rate) {

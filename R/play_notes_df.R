@@ -1,69 +1,39 @@
-#' Title
+#' play_notes_df
 #'
-#' @param df 
-#' @param name 
-#' @param length 
-#' @param octave 
-#' @param volume 
+#' @param data A data frame
+#' @param name character variable with note names
+#' @param octave numeric with note octave
+#' @param duration numeric with note duration
+#' @param volume numeric with note volume
 #'
 #' @return
 #' @export
 #'
 #' @examples
-play_notes_df <- function(df, note_name, length, octave, volume){
+play_notes_df <- function(data, name, octave, duration,  volume){
   
   rate <- 44100
   multiplier <- 2 * pi / rate
   bpm <- 80
   default_volume <- 5
   
-  note_names = df |> dplyr::pull({{note_name}})
-  lengths = df |> dplyr::pull({{length}})
-  octaves = df |> dplyr::pull({{octave}})
+  names = data |> dplyr::pull({{name}})
+  durations = data |> dplyr::pull({{duration}})
+  octaves = data |> dplyr::pull({{octave}})
   
   
   notes <- c()
     
-    for (i in 1:nrow(df)){
+    for (i in 1:nrow(data)){
 
     notes <- c(notes, 
-               note(note_name = note_names[i],
-                    length = lengths[i],
-                    octave = octaves[i]
+               note(name = names[i],
+                    octave = octaves[i],
+                    duration = durations[i]
                             ))
         
     }
   
     audio::play(notes)
 
-}
-  
-  
-play_drm_df <- function(df, drm, length, volume){
-  
-  rate <- 44100
-  multiplier <- 2 * pi / rate
-  bpm <- 80
-  default_volume <- 5
-  
-
-  drms = df |> dplyr::pull({{drm}}) 
-  lengths = df |> dplyr::pull({{length}})
-  volumes = df |> dplyr::pull({{volume}})
-  
-  
-  notes <- c()
-    
-    for (i in 1:nrow(df)){
-
-    notes <- c(notes, 
-               note(note_name = note_names[i],
-                    drm = drms[i],
-                    length = lengths[i]))
-        
-      }  
-  
-    
-  audio::play(notes)
-  
 }
